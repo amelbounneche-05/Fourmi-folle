@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Langton's Ant</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #f8f9fa;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        canvas {
+            border: 2px solid #333;
+            background: #f1f3f5;
+        }
+        #steps {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <div id="steps">Steps: 0</div>
+
+    <script src="src/index.js"></script>
+</body>
+</html>

@@ -1,70 +1,47 @@
-// Grid configuration: 100x100 grid with wrap-around (Pac-Man style)
-const GRID_SIZE = 100;
-const TOTAL_STEPS = 15000;
+const size = 100;
+const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+const ctx = canvas.getContext("2d")!;
+const cellSize = canvas.width / size;
 
-enum Direction {
-  NORTH = 0,
-  EAST = 1,
-  SOUTH = 2,
-  WEST = 3,
+const grid = Array.from({ length: size }, () => Array(size).fill(0));
+let x = 50, y = 50, dir = 0, steps = 0;
+const dx = [0, 1, 0, -1];
+const dy = [-1, 0, 1, 0];
+
+function loop() {
+  // 1. Ant logic (1 step)
+  if (grid[y]![x] === 0) {
+    dir = (dir + 1) % 4; // Turn right
+    grid[y]![x] = 1;     // Turn black
+  } else {
+    dir = (dir + 3) % 4; // Turn left
+    grid[y]![x] = 0;     // Turn white
+  }
+
+  x = (x + dx[dir]! + size) % size;
+  y = (y + dy[dir]! + size) % size;
+  steps++;
+
+  // 2. Rendering
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.fillStyle = "#2c3e50";
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (grid[r]![c] === 1) ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+    }
+  }
+
+  // Draw the red ant
+  ctx.fillStyle = "#e74c3c";
+  ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+
+  document.getElementById("steps")!.innerText = `Steps: ${steps}`;
+
+  // Delay to make it clearly visible (approx 30fps)
+  setTimeout(() => {
+    requestAnimationFrame(loop);
+  }, 30);
 }
 
-class LangtonAnt {
-  private grid: number[][];
-  private x: number;
-  private y: number;
-  private direction: Direction;
-
-  constructor() {
-    // 0 = White, 1 = Black
-    this.grid = Array.from({ length: GRID_SIZE }, () =>
-      Array(GRID_SIZE).fill(0)
-    );
-    this.x = Math.floor(GRID_SIZE / 2);
-    this.y = Math.floor(GRID_SIZE / 2);
-    this.direction = Direction.NORTH;
-  }
-
-  public step(): void {
-    const currentColor = this.grid[this.y][this.x];
-
-    if (currentColor === 0) {
-      // Turn right (90 degrees clockwise)
-      this.direction = (this.direction + 1) % 4;
-      // Flip color to black
-      this.grid[this.y][this.x] = 1;
-    } else {
-      // Turn left (90 degrees counter-clockwise)
-      this.direction = (this.direction + 3) % 4;
-      // Flip color to white
-      this.grid[this.y][this.x] = 0;
-    }
-
-    // Move forward 1 unit with Pac-Man style wrap-around
-    switch (this.direction) {
-      case Direction.NORTH:
-        this.y = (this.y - 1 + GRID_SIZE) % GRID_SIZE;
-        break;
-      case Direction.EAST:
-        this.x = (this.x + 1) % GRID_SIZE;
-        break;
-      case Direction.SOUTH:
-        this.y = (this.y + 1) % GRID_SIZE;
-        break;
-      case Direction.WEST:
-        this.x = (this.x - 1 + GRID_SIZE) % GRID_SIZE;
-        break;
-    }
-  }
-
-  public run(steps: number): void {
-    console.log(`Starting simulation for ${steps} steps...`);
-    for (let i = 0; i < steps; i++) {
-      this.step();
-    }
-    console.log(`Simulation finished at position (${this.x}, ${this.y}).`);
-  }
-}
-
-const ant = new LangtonAnt();
-ant.run(TOTAL_STEPS);
+loop();
